@@ -128,6 +128,12 @@ done
 for kernel_version in %{?kernel_versions}; do
     make %{?_smp_mflags} -C "${PWD}/_kmod_build_${kernel_version%%___*}/" M=%{kmod_path_kernel} INSTALL_MOD_PATH=${RPM_BUILD_ROOT} modules_install
 
+    # Delete all modules *.ko that does not match the kmod_name
+    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -name "*.ko" -type f -exec sh -c 'f="{}"; [ "$(basename "$f")" = "%{kmod_name}.ko" ] || rm -f "$f"' \;
+
+    # Eventually delete all orphan directories
+    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -type d -empty -delete
+
     # Delete modules.* files
     rm -f ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*}/modules.*
 done
