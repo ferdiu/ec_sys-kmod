@@ -28,7 +28,7 @@ This package provides common files for the module.
 %setup -q -n %{kmod_name}-kmod-%{version}-%{kmod_release_version}
 
 %install
-install -Dm 644 ./%{_lib}/modprobe.d/%{kmod_name}.conf %{buildroot}%{_libdir}/modprobe.d/%{kmod_name}.conf
+install -Dm 644 ./lib/modprobe.d/%{kmod_name}.conf %{buildroot}%{_libdir}/modprobe.d/%{kmod_name}.conf
 
 %files
 %attr(644,root,root) %{_libdir}/modprobe.d/%{kmod_name}.conf
