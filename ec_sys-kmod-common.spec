@@ -25,10 +25,10 @@ for the EC_SYS ACPI debugging (and writing).
 This package provides common files for the module.
 
 %prep
-%setup -q
+%setup -q -n %{kmod_name}-kmod-%{version}-%{kmod_release_version}
 
 %install
-install -Dm 644 .%{_libdir}/modprobe.d/%{kmod_name}.conf %{buildroot}%{_libdir}/modprobe.d/%{kmod_name}.conf
+install -Dm 644 ./%{_lib}/modprobe.d/%{kmod_name}.conf %{buildroot}%{_libdir}/modprobe.d/%{kmod_name}.conf
 
 %files
 %attr(644,root,root) %{_libdir}/modprobe.d/%{kmod_name}.conf
