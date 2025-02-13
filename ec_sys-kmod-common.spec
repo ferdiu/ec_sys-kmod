@@ -31,7 +31,7 @@ This package provides common files for the module.
 install -Dm 644 ./lib/modprobe.d/%{kmod_name}.conf %{buildroot}/lib/modprobe.d/%{kmod_name}.conf
 
 %files
-%attr(644,root,root) %{_libdir}/modprobe.d/%{kmod_name}.conf
+%attr(644,root,root) /lib/modprobe.d/%{kmod_name}.conf
 %doc README.md
 %license LICENSE
 
