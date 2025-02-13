@@ -2,7 +2,7 @@
 
 %define kmod_name             ec_sys
 %define kmod_version          1.0
-%define kmod_release_version  1
+%define kmod_release_version  2
 %define kmod_path_kernel      drivers/acpi
 
 Name:           %{kmod_name}-kmod-common
@@ -36,5 +36,8 @@ install -Dm 644 ./lib/modprobe.d/%{kmod_name}.conf %{buildroot}%{_libdir}/modpro
 %license LICENSE
 
 %changelog
+* Thu Feb 13 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-2
+- Add autmoatic agree with default new configs during prepare step
+
 * Wed Feb 12 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-1
 - Initial release
