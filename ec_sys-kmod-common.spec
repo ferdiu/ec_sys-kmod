@@ -2,7 +2,7 @@
 
 %define kmod_name             ec_sys
 %define kmod_version          1.0
-%define kmod_release_version  2
+%define kmod_release_version  3
 %define kmod_path_kernel      drivers/acpi
 
 Name:           %{kmod_name}-kmod-common
@@ -28,7 +28,7 @@ This package provides common files for the module.
 %setup -q -n %{kmod_name}-kmod-%{version}-%{kmod_release_version}
 
 %install
-install -Dm 644 ./lib/modprobe.d/%{kmod_name}.conf %{buildroot}%{_libdir}/modprobe.d/%{kmod_name}.conf
+install -Dm 644 ./lib/modprobe.d/%{kmod_name}.conf %{buildroot}/lib/modprobe.d/%{kmod_name}.conf
 
 %files
 %attr(644,root,root) %{_libdir}/modprobe.d/%{kmod_name}.conf
@@ -36,6 +36,9 @@ install -Dm 644 ./lib/modprobe.d/%{kmod_name}.conf %{buildroot}%{_libdir}/modpro
 %license LICENSE
 
 %changelog
+* Thu Feb 13 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-3
+- Fix: wrong path for the modprobe config file
+
 * Thu Feb 13 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-2
 - Add autmoatic agree with default new configs during prepare step
 
