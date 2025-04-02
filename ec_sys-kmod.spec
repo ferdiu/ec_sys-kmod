@@ -28,6 +28,7 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  kernel-devel
 BuildRequires:  koji
+BuildRequires:  rustfmt
 BuildRequires:  %{_bindir}/kmodtool
 
 %{!?kernels:BuildRequires: buildsys-build-rpmfusion-kerneldevpkgs-%{?buildforkernels:%{buildforkernels}}%{!?buildforkernels:current}-%{_target_cpu} }
@@ -141,6 +142,9 @@ done
 
 
 %changelog
+* Wed Apr 2 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-4
+- Add rustfmt in ec_sys-kmod build requires
+
 * Thu Feb 13 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-3
 - Fix: wrong path for the modprobe config file
 
