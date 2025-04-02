@@ -7,7 +7,7 @@
 %define kmod_name             ec_sys
 %define kmod_path_kernel      drivers/acpi
 %define kmod_version          1.0
-%define kmod_release_version  3
+%define kmod_release_version  4
 %define repo                  rpmfusion
 # The following line is only needed for those modules
 # that by default are not included in the kernel configuration
