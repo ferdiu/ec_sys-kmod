@@ -21,23 +21,37 @@ To build the RPM packages, follow these steps:
    spectool -g -R ec_sys-kmod.spec
    ```
 
-3. Install dependencies:
+3. Link the spec files:
    ```sh
-   sudo dnf install -y rpm-build kernel-devel koji kmodtool
+   ln -s $(realpath ./ec_sys-kmod-common.spec) $(rpm --eval %_topdir)/SPECS/ec_sys-kmod-common.spec
+   ln -s $(realpath ./ec_sys-kmod.spec) $(rpm --eval %_topdir)/SPECS/ec_sys-kmod.spec
    ```
 
-4. Build the RPM packages:
+4. Install dependencies:
+   ```sh
+   sudo dnf install -y rpm-build kernel-devel koji kmodtool rustfmt
+   ```
+
+5. Build the RPM packages:
    ```sh
    rpmbuild -bb ec_sys-kmod-common.spec
    rpmbuild -bb ec_sys-kmod.spec
    ```
 
+6. Remove created links (optional):
+   ```sh
+   rm $(rpm --eval %_topdir)/SPECS/ec_sys-kmod-common.spec
+   rm $(rpm --eval %_topdir)/SPECS/ec_sys-kmod.spec
+   ```
+
 ## Installation
 Once the RPMs are built, you can install them using:
 ```sh
-sudo dnf install ./rpmbuild/RPMS/noarch/ec_sys-kmod-common-*.rpm
-sudo dnf install ./rpmbuild/RPMS/x86_64/ec_sys-kmod-*.rpm
+sudo dnf install $(rpm --eval %_topdir)/RPMS/noarch/ec_sys-kmod-common-*.rpm
+sudo dnf install $(rpm --eval %_topdir)/RPMS/x86_64/ec_sys-kmod-*.rpm
 ```
+
+Note: change the path to the RPMs if necessary.
 
 ## Usage
 After installation, load the `ec_sys` module with:
