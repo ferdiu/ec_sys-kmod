@@ -2,7 +2,7 @@
 
 %define kmod_name             ec_sys
 %define kmod_version          1.0
-%define kmod_release_version  4
+%define kmod_release_version  5
 %define kmod_path_kernel      drivers/acpi
 
 Name:           %{kmod_name}-kmod-common
@@ -36,7 +36,10 @@ install -Dm 644 ./lib/modprobe.d/%{kmod_name}.conf %{buildroot}/lib/modprobe.d/%
 %license LICENSE
 
 %changelog
-* Fri Apr 4 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-4
+* Fri Apr 4 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-5
+- Fix source download problem
+
+* Thu Feb 13 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-4
 - Add rustfmt in ec_sys-kmod build requires
 
 * Thu Feb 13 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-3
