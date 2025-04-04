@@ -2,7 +2,7 @@
 
 %define kmod_name             ec_sys
 %define kmod_version          1.0
-%define kmod_release_version  3
+%define kmod_release_version  4
 %define kmod_path_kernel      drivers/acpi
 
 Name:           %{kmod_name}-kmod-common
@@ -15,7 +15,7 @@ Group:          System Environment/Kernel
 
 License:        MIT
 URL:            https://github.com/ferdiu/ec_sys-kmod
-Source0:        %{url}/archive/refs/tags/v%{version}-%{kmod_release_version}.tar.gz#/%{kmod_name}-kmod-v%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}-%{kmod_release_version}.tar.gz#/%{kmod_name}-kmod-v%{version}-%{kmod_release_version}.tar.gz
 BuildArch:	    noarch
 
 %description
@@ -36,6 +36,9 @@ install -Dm 644 ./lib/modprobe.d/%{kmod_name}.conf %{buildroot}/lib/modprobe.d/%
 %license LICENSE
 
 %changelog
+* Fri Apr 4 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-4
+- Add rustfmt in ec_sys-kmod build requires
+
 * Thu Feb 13 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-3
 - Fix: wrong path for the modprobe config file
 
