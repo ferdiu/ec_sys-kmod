@@ -7,7 +7,7 @@
 %define kmod_name             ec_sys
 %define kmod_path_kernel      drivers/acpi
 %define kmod_version          1.0
-%define kmod_release_version  5
+%define kmod_release_version  6
 %define repo                  rpmfusion
 # The following line is only needed for those modules
 # that by default are not included in the kernel configuration
@@ -23,7 +23,7 @@ Summary:        Kernel module ec_sys
 Group:          System Environment/Kernel
 License:        GPLv2
 URL:            https://github.com/ferdiu/ec_sys-kmod
-Source0:        %{url}/archive/refs/tags/v%{version}-%{kmod_release_version}.tar.gz#/%{name}-v%{version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}-%{kmod_release_version}.tar.gz#/%{name}-v%{version}-%{kmod_release_version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  kernel-devel
@@ -142,6 +142,9 @@ done
 
 
 %changelog
+* Fri Apr 4 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-6
+- Fix source download problem in ec_sys-kmod.spec
+
 * Fri Apr 4 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-5
 - Fix source download problem
 
