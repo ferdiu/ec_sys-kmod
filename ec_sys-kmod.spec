@@ -30,6 +30,8 @@ BuildRequires:  kernel-devel
 BuildRequires:  koji
 BuildRequires:  rustfmt
 BuildRequires:  %{_bindir}/kmodtool
+BuildRequires:  kernel-rpm-macros
+BuildRequires:  %{?kernel_module_package_buildreqs}
 
 %{!?kernels:BuildRequires: buildsys-build-rpmfusion-kerneldevpkgs-%{?buildforkernels:%{buildforkernels}}%{!?buildforkernels:current}-%{_target_cpu} }
 
