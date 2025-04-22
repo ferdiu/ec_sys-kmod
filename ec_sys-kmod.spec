@@ -7,7 +7,7 @@
 %define kmod_name             ec_sys
 %define kmod_path_kernel      drivers/acpi
 %define kmod_version          1.0
-%define kmod_release_version  6
+%define kmod_release_version  7
 %define repo                  rpmfusion
 # The following line is only needed for those modules
 # that by default are not included in the kernel configuration
@@ -144,6 +144,9 @@ done
 
 
 %changelog
+* Tue Apr 22 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-7
+- Fix missing kernel build dependencies in BuildRequires
+
 * Fri Apr 4 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-6
 - Fix source download problem in ec_sys-kmod.spec
 
