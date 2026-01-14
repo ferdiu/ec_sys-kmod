@@ -1,8 +1,6 @@
-# (un)define the next line to either build for the newest or all current kernels
-
 %define kmod_name             ec_sys
 %define kmod_version          1.0
-%define kmod_release_version  6
+%define kmod_release_version  7
 %define kmod_path_kernel      drivers/acpi
 
 Name:           %{kmod_name}-kmod-common
@@ -36,6 +34,9 @@ install -Dm 644 ./lib/modprobe.d/%{kmod_name}.conf %{buildroot}/lib/modprobe.d/%
 %license LICENSE
 
 %changelog
+* Tue Apr 22 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-7
+- Fix missing kernel build dependencies in BuildRequires
+
 * Fri Apr 4 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-6
 - Fix source download problem in ec_sys-kmod.spec
 
