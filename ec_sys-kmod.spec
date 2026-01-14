@@ -26,19 +26,17 @@ URL:            https://github.com/ferdiu/ec_sys-kmod
 Source0:        %{url}/archive/refs/tags/v%{version}-%{kmod_release_version}.tar.gz#/%{name}-v%{version}-%{kmod_release_version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  akmods
-BuildRequires:  kernel-rpm-macros
-BuildRequires:  %{_bindir}/kmodtool
+# Standard kmod build requirements
+%global AkmodsBuildRequires %{_bindir}/kmodtool
+BuildRequires:  %{AkmodsBuildRequires}
+
+# Kernel build dependencies - needed for building kernel modules
+%{!?kernels:BuildRequires: gcc, elfutils-libelf-devel, buildsys-build-rpmfusion-kerneldevpkgs-%{?buildforkernels:%{buildforkernels}}%{!?buildforkernels:current}-%{_target_cpu} }
+
+# Additional tools needed for koji-based kernel source download approach
 BuildRequires:  koji
+BuildRequires:  rpm-build
 BuildRequires:  rustfmt
-
-# This macro includes the kernel builddeps here
-%{?kernel_module_package:%kernel_module_package -n %{kmod_name}}
-
-
-%if 0%{?__koji}
-%{!?kernels:BuildRequires: buildsys-build-rpmfusion-kerneldevpkgs-%{?buildforkernels:%{buildforkernels}}%{!?buildforkernels:current}-%{_target_cpu} }
-%endif
 
 # kmodtool does its magic here
 %{expand:%(kmodtool --target %{_target_cpu} --repo %{repo} --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | sed 's|extra|updates|g' | sed 's|%{kmod_name}/||g') }
@@ -76,8 +74,6 @@ for kernel_version in %{?kernel_versions} ; do
     # Download kernel source
     koji download-build --arch=src "kernel-${kernel_v}"
 
-    ls
-
     # Unpack source and kernel.spec file
     rpm \
         --define "_sourcedir ${PWD}" \
@@ -88,17 +84,16 @@ for kernel_version in %{?kernel_versions} ; do
         --define "_buildrootdir ${PWD}/.build" \
         -Uvh kernel-${kernel_v_no_arch}.src.rpm
 
-    ls
-
     # Unpack source and apply (original) patches
-    rpmbuild \
+    # --nodeps here allows to skip build dependency checks (not all kernel build dependencies are needed)
+    rpmbuild --nodeps \
         --define "_sourcedir ${PWD}" \
         --define "_specdir ${PWD}" \
         --define "_builddir ${PWD}" \
         --define "_srcrpmdir ${PWD}" \
         --define "_rpmdir ${PWD}" \
         --define "_buildrootdir ${PWD}/.build" \
-        -bp --target="$(uname -m)" kernel.spec
+        -bp --target="$(uname -m)" kernel.spec 2>&1 || true # Even if it fail we are ok!
 
     if [ %{fedora} -gt 40 ]; then
         build_dir="./kernel-${kernel_v_no_extra}-build/kernel-${kernel_v_no_extra}/linux-${kernel_v}"
