@@ -23,15 +23,18 @@ Summary:        Kernel module ec_sys
 Group:          System Environment/Kernel
 License:        GPLv2
 URL:            https://github.com/ferdiu/ec_sys-kmod
-Source0:        %{url}/archive/refs/tags/v%{version}-%{kmod_release_version}.tar.gz#/%{name}-v%{version}-%{kmod_release_version}.tar.gz
+Source0:        %{url}/archive/refs/heads/%{dev_branch_name}.tar.gz#/%{kmod_name}-kmod-v%{version}-%{kmod_release_version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-BuildRequires:  kernel-devel
+BuildRequires:  akmods
+BuildRequires:  kernel-rpm-macros
+BuildRequires:  %{_bindir}/kmodtool
 BuildRequires:  koji
 BuildRequires:  rustfmt
-BuildRequires:  %{_bindir}/kmodtool
-BuildRequires:  kernel-rpm-macros
-BuildRequires:  %{?kernel_module_package_buildreqs}
+
+# This macro includes the kernel builddeps here
+%{?kernel_module_package:%kernel_module_package -n %{kmod_name}}
+
 
 %{!?kernels:BuildRequires: buildsys-build-rpmfusion-kerneldevpkgs-%{?buildforkernels:%{buildforkernels}}%{!?buildforkernels:current}-%{_target_cpu} }
 

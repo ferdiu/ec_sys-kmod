@@ -1,5 +1,3 @@
-# (un)define the next line to either build for the newest or all current kernels
-
 %define kmod_name             ec_sys
 %define kmod_version          1.0
 %define kmod_release_version  7
