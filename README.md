@@ -48,7 +48,7 @@ To build the RPM packages, follow these steps:
 Once the RPMs are built, you can install them using:
 ```sh
 sudo dnf install $(rpm --eval %_topdir)/RPMS/noarch/ec_sys-kmod-common-*.rpm
-sudo dnf install $(rpm --eval %_topdir)/RPMS/x86_64/ec_sys-kmod-*.rpm
+sudo dnf install $(rpm --eval %_topdir)/RPMS/$(rpm --eval %_arch)/ec_sys-kmod-*.rpm
 ```
 
 Note: change the path to the RPMs if necessary.
