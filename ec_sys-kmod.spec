@@ -23,7 +23,7 @@ Summary:        Kernel module ec_sys
 Group:          System Environment/Kernel
 License:        GPLv2
 URL:            https://github.com/ferdiu/ec_sys-kmod
-Source0:        %{url}/archive/refs/heads/%{dev_branch_name}.tar.gz#/%{kmod_name}-kmod-v%{version}-%{kmod_release_version}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}-%{kmod_release_version}.tar.gz#/%{name}-v%{version}-%{kmod_release_version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildRequires:  akmods
@@ -36,7 +36,9 @@ BuildRequires:  rustfmt
 %{?kernel_module_package:%kernel_module_package -n %{kmod_name}}
 
 
+%if 0%{?__koji}
 %{!?kernels:BuildRequires: buildsys-build-rpmfusion-kerneldevpkgs-%{?buildforkernels:%{buildforkernels}}%{!?buildforkernels:current}-%{_target_cpu} }
+%endif
 
 # kmodtool does its magic here
 %{expand:%(kmodtool --target %{_target_cpu} --repo %{repo} --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | sed 's|extra|updates|g' | sed 's|%{kmod_name}/||g') }
