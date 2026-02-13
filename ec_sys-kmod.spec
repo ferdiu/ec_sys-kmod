@@ -39,7 +39,14 @@ BuildRequires:  rpm-build
 BuildRequires:  rustfmt
 
 # kmodtool does its magic here
-%{expand:%(kmodtool --target %{_target_cpu} --repo %{repo} --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | sed 's|extra|updates|g' | sed 's|%{kmod_name}/||g') }
+%{expand:%(kmodtool --target %{_target_cpu} \
+    --repo %{repo} \
+    --kmodname %{name} \
+    %{?buildforkernels:--%{buildforkernels}} \
+    %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | \
+        sed 's|extra|updates|g' | \
+            sed 's|%{kmod_name}/||g'
+)}
 
 # NOTE: the previous command is piped to two call to sed to substitute the destination
 # path of the module to updates directory (instead of extra) because this SPEC is intended
@@ -55,7 +62,12 @@ for the EC_SYS ACPI debugging (and writing).
 %{?kmodtool_check}
 
 # print kmodtool output for debugging purposes:
-kmodtool  --target %{_target_cpu}  --repo %{repo} --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | sed 's|extra|updates|g' | sed 's|%{kmod_name}/||g'
+kmodtool --target %{_target_cpu} \
+    --repo %{repo} \
+    --kmodname %{name} \
+    %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | \
+        sed 's|extra|updates|g' | \
+            sed 's|%{kmod_name}/||g'
 
 %setup -q -c -T -a 0
 
@@ -130,10 +142,12 @@ done
 
 %install
 for kernel_version in %{?kernel_versions}; do
-    make %{?_smp_mflags} -C "${PWD}/_kmod_build_${kernel_version%%___*}/" M=%{kmod_path_kernel} INSTALL_MOD_PATH=${RPM_BUILD_ROOT} modules_install
+    make %{?_smp_mflags} -C "${PWD}/_kmod_build_${kernel_version%%___*}/" \
+        M=%{kmod_path_kernel} INSTALL_MOD_PATH=${RPM_BUILD_ROOT} modules_install
 
     # Delete all modules *.ko that does not match the kmod_name
-    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -name "*.ko" -type f -exec sh -c 'f="{}"; [ "$(basename "$f")" = "%{kmod_name}.ko" ] || rm -f "$f"' \;
+    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -name "*.ko" -type f -exec \
+        sh -c 'f="{}"; [ "$(basename "$f")" = "%{kmod_name}.ko" ] || rm -f "$f"' \;
 
     # Eventually delete all orphan directories
     find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -type d -empty -delete
