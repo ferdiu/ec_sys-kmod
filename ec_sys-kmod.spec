@@ -63,6 +63,7 @@ for kernel_version in %{?kernel_versions} ; do
     kernel_v=${kernel_version%%___*}                            # eg. 6.12.11-200.fc41.x86_64
     kernel_v_no_arch=${kernel_v%.*}                             # eg. 6.12.11-200.fc41
     kernel_extra=${kernel_v#*-}                                 # eg. 200.fc41.x86_64
+    kernel_patch=${kernel_extra%%%%.*}                          # eg. 200
     kernel_v_no_extra="$(echo -n ${kernel_v} | cut -d"-" -f1)"  # eg. 6.12.11
     kernel_src_dir=${kernel_version##*__}                       # eg. /usr/src/kernels/6.12.11-200.fc41.x86_64
 
@@ -96,7 +97,7 @@ for kernel_version in %{?kernel_versions} ; do
         -bp --target="$(uname -m)" kernel.spec 2>&1 || true # Even if it fail we are ok!
 
     if [ %{fedora} -gt 40 ]; then
-        build_dir="./kernel-${kernel_v_no_extra}-build/kernel-${kernel_v_no_extra}/linux-${kernel_v}"
+        build_dir="./kernel-${kernel_v_no_extra}-build/kernel-${kernel_v_no_extra}/linux-${kernel_v_no_extra}-${kernel_patch}%{dist}.%{_arch}"
     else
         build_dir="./kernel-${kernel_v_no_extra}/linux-${kernel_v}"
     fi
