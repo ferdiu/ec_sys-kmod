@@ -65,7 +65,8 @@ for the EC_SYS ACPI debugging (and writing).
 kmodtool --target %{_target_cpu} \
     --repo %{repo} \
     --kmodname %{name} \
-    %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | \
+    %{?buildforkernels:--%{buildforkernels}} \
+    %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | \
         sed 's|extra|updates|g' | \
             sed 's|%{kmod_name}/||g'
 
