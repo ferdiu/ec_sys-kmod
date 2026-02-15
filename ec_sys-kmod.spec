@@ -39,7 +39,14 @@ BuildRequires:  rpm-build
 BuildRequires:  rustfmt
 
 # kmodtool does its magic here
-%{expand:%(kmodtool --target %{_target_cpu} --repo %{repo} --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | sed 's|extra|updates|g' | sed 's|%{kmod_name}/||g') }
+%{expand:%(kmodtool --target %{_target_cpu} \
+    --repo %{repo} \
+    --kmodname %{name} \
+    %{?buildforkernels:--%{buildforkernels}} \
+    %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | \
+        sed 's|extra|updates|g' | \
+            sed 's|%{kmod_name}/||g'
+)}
 
 # NOTE: the previous command is piped to two call to sed to substitute the destination
 # path of the module to updates directory (instead of extra) because this SPEC is intended
@@ -55,7 +62,13 @@ for the EC_SYS ACPI debugging (and writing).
 %{?kmodtool_check}
 
 # print kmodtool output for debugging purposes:
-kmodtool  --target %{_target_cpu}  --repo %{repo} --kmodname %{name} %{?buildforkernels:--%{buildforkernels}} %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | sed 's|extra|updates|g' | sed 's|%{kmod_name}/||g'
+kmodtool --target %{_target_cpu} \
+    --repo %{repo} \
+    --kmodname %{name} \
+    %{?buildforkernels:--%{buildforkernels}} \
+    %{?kernels:--for-kernels "%{?kernels}"} 2>/dev/null | \
+        sed 's|extra|updates|g' | \
+            sed 's|%{kmod_name}/||g'
 
 %setup -q -c -T -a 0
 
@@ -63,6 +76,7 @@ for kernel_version in %{?kernel_versions} ; do
     kernel_v=${kernel_version%%___*}                            # eg. 6.12.11-200.fc41.x86_64
     kernel_v_no_arch=${kernel_v%.*}                             # eg. 6.12.11-200.fc41
     kernel_extra=${kernel_v#*-}                                 # eg. 200.fc41.x86_64
+    kernel_patch=${kernel_extra%%%%.*}                          # eg. 200
     kernel_v_no_extra="$(echo -n ${kernel_v} | cut -d"-" -f1)"  # eg. 6.12.11
     kernel_src_dir=${kernel_version##*__}                       # eg. /usr/src/kernels/6.12.11-200.fc41.x86_64
 
@@ -96,7 +110,7 @@ for kernel_version in %{?kernel_versions} ; do
         -bp --target="$(uname -m)" kernel.spec 2>&1 || true # Even if it fail we are ok!
 
     if [ %{fedora} -gt 40 ]; then
-        build_dir="./kernel-${kernel_v_no_extra}-build/kernel-${kernel_v_no_extra}/linux-${kernel_v}"
+        build_dir="./kernel-${kernel_v_no_extra}-build/kernel-${kernel_v_no_extra}/linux-${kernel_v_no_extra}-${kernel_patch}%{dist}.%{_arch}"
     else
         build_dir="./kernel-${kernel_v_no_extra}/linux-${kernel_v}"
     fi
@@ -129,10 +143,12 @@ done
 
 %install
 for kernel_version in %{?kernel_versions}; do
-    make %{?_smp_mflags} -C "${PWD}/_kmod_build_${kernel_version%%___*}/" M=%{kmod_path_kernel} INSTALL_MOD_PATH=${RPM_BUILD_ROOT} modules_install
+    make %{?_smp_mflags} -C "${PWD}/_kmod_build_${kernel_version%%___*}/" \
+        M=%{kmod_path_kernel} INSTALL_MOD_PATH=${RPM_BUILD_ROOT} modules_install
 
     # Delete all modules *.ko that does not match the kmod_name
-    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -name "*.ko" -type f -exec sh -c 'f="{}"; [ "$(basename "$f")" = "%{kmod_name}.ko" ] || rm -f "$f"' \;
+    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -name "*.ko" -type f -exec \
+        sh -c 'f="{}"; [ "$(basename "$f")" = "%{kmod_name}.ko" ] || rm -f "$f"' \;
 
     # Eventually delete all orphan directories
     find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -type d -empty -delete

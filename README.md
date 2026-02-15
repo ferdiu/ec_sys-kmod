@@ -70,6 +70,9 @@ This project is licensed under the **MIT** and **GPLv2** licenses. See the `LICE
 ## Maintainer
 - [**Federico Manzella**](https://github.com/ferdiu)
 
+## Contributors
+- [**Kris**](https://github.com/kris3713): add support for Ultramarine Linux (and potentially any other Fedora-based distros)
+
 ## Changelog
 ### v1.0 (Feb 12, 2025)
 - Initial release
