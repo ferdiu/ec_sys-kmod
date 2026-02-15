@@ -7,7 +7,7 @@
 %define kmod_name             ec_sys
 %define kmod_path_kernel      drivers/acpi
 %define kmod_version          1.0
-%define kmod_release_version  7
+%define kmod_release_version  8
 %define repo                  rpmfusion
 # The following line is only needed for those modules
 # that by default are not included in the kernel configuration
@@ -160,6 +160,9 @@ done
 
 
 %changelog
+* Sun Feb 15 2026 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-8
+- Add support for Ultramarine Linux (and potentially any other Fedora-based distros)
+
 * Tue Apr 22 2025 Federico Manzella <ferdiu.manzella@gmail.com> - 1.0-7
 - Fix missing kernel build dependencies in BuildRequires
 
