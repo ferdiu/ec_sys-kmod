@@ -126,7 +126,7 @@ for kernel_version in %{?kernel_versions} ; do
     cp -a ${kernel_src_dir}/{.config,Module.symvers,System.map} ./_kmod_build_${kernel_v}/
 
     # Set correct extra version in Makefile
-    sed -i 's/^EXTRAVERSION.*$/EXTRAVERSION=-'"${kernel_extra}"'/' "./_kmod_build_${kernel_v}/Makefile"
+    sed -i 's/^EXTRAVERSION.*$/EXTRAVERSION=-'"${kernel_patch}%{dist}.%{_arch}"'/' "./_kmod_build_${kernel_v}/Makefile"
 
     # Patch .config to enable the module
     sed -i -r 's/^.*\b('"%{kernel_config_entry}"')\b.*$\b/\1=m/' "./_kmod_build_${kernel_v}/.config"
@@ -143,19 +143,37 @@ done
 
 %install
 for kernel_version in %{?kernel_versions}; do
+    kernel_v=${kernel_version%%___*}                            # eg. 6.12.11-200.fc41.x86_64
+    kernel_v_no_arch=${kernel_v%.*}                             # eg. 6.12.11-200.fc41
+    kernel_extra=${kernel_v#*-}                                 # eg. 200.fc41.x86_64
+    kernel_patch=${kernel_extra%%%%.*}                          # eg. 200
+    kernel_v_no_extra="$(echo -n ${kernel_v} | cut -d"-" -f1)"  # eg. 6.12.11
+    kernel_src_dir=${kernel_version##*__}                       # eg. /usr/src/kernels/6.12.11-200.fc41.x86_64
+    # Two step substitution to gather the koji dist name
+    kernel_dist=${kernel_extra#*.}
+    kernel_dist=.${kernel_dist%%.*}                             # eg. .fc41 (NOTE: the dot)
+
+    # This is used in paths like /lib/modules/{here} since these are built using the
+    # EXTRAVERSION set in the kernel Makefile that we previously replaced with the
+    # proper name used by our distribution
+    current_system_kernel_version="${kernel_v_no_extra}-${kernel_patch}%{dist}.%{_arch}"
+    # on Fedora it would be like 6.12.11-200.fc41.x86_64
+    # on Ultramarine it would be like 6.12.11-200.um41.x86_64
+
     make %{?_smp_mflags} -C "${PWD}/_kmod_build_${kernel_version%%___*}/" \
         M=%{kmod_path_kernel} INSTALL_MOD_PATH=${RPM_BUILD_ROOT} modules_install
 
     # Delete all modules *.ko that does not match the kmod_name
-    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -name "*.ko" -type f -exec \
+    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${current_system_kernel_version} -name "*.ko" -type f -exec \
         sh -c 'f="{}"; [ "$(basename "$f")" = "%{kmod_name}.ko" ] || rm -f "$f"' \;
 
     # Eventually delete all orphan directories
-    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*} -type d -empty -delete
+    find ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${current_system_kernel_version} -type d -empty -delete
 
     # Delete modules.* files
-    rm -f ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${kernel_version%%___*}/modules.*
+    rm -f ${RPM_BUILD_ROOT}%{kmodinstdir_prefix}${current_system_kernel_version}/modules.*
 done
+# akmod_install with kernel_dist replaced (e.g. replace .fc41 with .um41)
 %{?akmod_install}
 
 
