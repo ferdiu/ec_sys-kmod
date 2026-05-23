@@ -1,0 +1,76 @@
+# Monitors three upstream projects for new releases and triggers a COPR build
+# for each package when a newer version is available than what is currently
+# in the ferdiu/kernel-modules COPR project.
+#
+# Required GitHub repository secrets (Settings → Secrets → Actions):
+#   COPR_BUILD_L  — copr-cli login    (from https://copr.fedorainfracloud.org/api)
+#   COPR_BUILD_T  — copr-cli token    (from https://copr.fedorainfracloud.org/api)
+#
+# The copr-cli config section name must be "copr-cli" (default).
+# Download your token config from https://copr.fedorainfracloud.org/api and
+# split the login and token values into the two secrets above.
+
+name: COPR CI build
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+env:
+  COPR_USERNAME:    ferdiu
+  COPR_PROJECT:     kernel-modules
+  COPR_URL:         https://copr.fedorainfracloud.org
+  GIT_USER_NAME:    ferdiu
+  GIT_USER_EMAIL:   ferdiu@users.noreply.github.com
+  SPEC_FILE:        ec_sys-kmod.spec
+
+##############################################################################
+# Job: Build the theme
+##############################################################################
+jobs:
+  BuildKmod:
+    runs-on: ubuntu-latest
+    container: fedora:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ github.repository }}
+
+      - name: Install dependencies
+        run: dnf install -y -q copr-cli python3 git rpm-build rpmdevtools
+
+      - name: Configure copr-cli
+        run: |
+          mkdir -p "$HOME/.config"
+          cat > "$HOME/.config/copr" << EOF
+          [copr-cli]
+          login    = ${{ secrets.COPR_BUILD_L }}
+          username = ${{ env.COPR_USERNAME }}
+          token    = ${{ secrets.COPR_BUILD_T }}
+          copr_url = ${{ env.COPR_URL }}
+          EOF
+
+      - name: Trigger COPR build
+        run: |
+          echo "Downloading source..."
+          spectool -g -C "$GITHUB_WORKSPACE/" "$GITHUB_WORKSPACE/${{ env.SPEC_FILE }}"
+          spectool -g -C "$GITHUB_WORKSPACE/" "$GITHUB_WORKSPACE/${{ env.SPEC_FILE }}-common"
+
+          echo "Building sRPM..."
+          rpmbuild -bs \
+            --define "_sourcedir $GITHUB_WORKSPACE" \
+            --define "_specdir $GITHUB_WORKSPACE" \
+            --define "_srcrpmdir $GITHUB_WORKSPACE" \
+            $GITHUB_WORKSPACE/${{ env.SPEC_FILE }}
+          rpmbuild -bs \
+            --define "_sourcedir $GITHUB_WORKSPACE" \
+            --define "_specdir $GITHUB_WORKSPACE" \
+            --define "_srcrpmdir $GITHUB_WORKSPACE" \
+            $GITHUB_WORKSPACE/${{ env.SPEC_FILE }}-common
+
+          echo "Starting COPR build"
+          copr-cli build "${{ env.COPR_PROJECT }}" $GITHUB_WORKSPACE/*.src.rpm
