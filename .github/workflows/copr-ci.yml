@@ -25,6 +25,7 @@ env:
   GIT_USER_NAME:    ferdiu
   GIT_USER_EMAIL:   ferdiu@users.noreply.github.com
   SPEC_FILE:        ec_sys-kmod.spec
+  SPEC_FILE_COMMON: ec_sys-kmod-common.spec
 
 ##############################################################################
 # Job: Build the theme
@@ -58,7 +59,7 @@ jobs:
         run: |
           echo "Downloading source..."
           spectool -g -C "$GITHUB_WORKSPACE/" "$GITHUB_WORKSPACE/${{ env.SPEC_FILE }}"
-          spectool -g -C "$GITHUB_WORKSPACE/" "$GITHUB_WORKSPACE/${{ env.SPEC_FILE }}-common"
+          spectool -g -C "$GITHUB_WORKSPACE/" "$GITHUB_WORKSPACE/${{ env.SPEC_FILE_COMMON }}"
 
           echo "Building sRPM..."
           rpmbuild -bs \
@@ -70,7 +71,7 @@ jobs:
             --define "_sourcedir $GITHUB_WORKSPACE" \
             --define "_specdir $GITHUB_WORKSPACE" \
             --define "_srcrpmdir $GITHUB_WORKSPACE" \
-            $GITHUB_WORKSPACE/${{ env.SPEC_FILE }}-common
+            $GITHUB_WORKSPACE/${{ env.SPEC_FILE_COMMON }}
 
           echo "Starting COPR build"
           copr-cli build "${{ env.COPR_PROJECT }}" $GITHUB_WORKSPACE/*.src.rpm
